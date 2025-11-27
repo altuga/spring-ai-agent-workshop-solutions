@@ -82,9 +82,82 @@ To enable these features, ensure you have the following dependencies in your `po
     <groupId>org.springframework.ai</groupId>
     <artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
 </dependency>
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-vertex-ai-gemini-spring-boot-starter</artifactId>
+</dependency>
 ```
 
 Finally, we have provided a simple `index.html` in `src/main/resources/static/index.html` to interact with the bot.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spring Boot Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #chat { height: 400px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
+        #message { width: 70%; padding: 10px; }
+        button { padding: 10px 20px; }
+        .message { margin-bottom: 10px; }
+        .user { color: blue; text-align: right; }
+        .bot { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Spring Boot Chatbot</h1>
+    <div id="chat"></div>
+    <input type="text" id="message" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const chat = document.getElementById('chat');
+        const messageInput = document.getElementById('message');
+        const socket = new WebSocket('ws://localhost:8080/chat-bot');
+
+        socket.onopen = function(event) {
+            appendMessage('System', 'Connected to chat bot', 'bot');
+        };
+
+        socket.onmessage = function(event) {
+            appendMessage('Bot', event.data, 'bot');
+        };
+
+        socket.onclose = function(event) {
+            appendMessage('System', 'Disconnected from chat bot', 'bot');
+        };
+
+        function sendMessage() {
+            const message = messageInput.value;
+            if (message) {
+                socket.send(message);
+                appendMessage('You', message, 'user');
+                messageInput.value = '';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function appendMessage(sender, message, type) {
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${type}`;
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chat.appendChild(messageElement);
+            chat.scrollTop = chat.scrollHeight;
+        }
+    </script>
+</body>
+</html>
+```
 
 Congratulations, you have built your first chatbot!
 You can interact with the bot by opening your browser and navigating to http://localhost:8080/
@@ -109,8 +182,21 @@ For enterprise grade chatbots avoid higher temperatures to avoid bots getting to
 For the rest of the workshop you can use the following configuration.
 
 ```properties
+# Exclude other auto-configurations to avoid conflicts (multiple ChatModels found)
+spring.autoconfigure.exclude=org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration,org.springframework.ai.autoconfigure.vertexai.gemini.VertexAiGeminiAutoConfiguration
+
+# Ollama Configuration
 spring.ai.ollama.base-url=http://localhost:11434
 spring.ai.ollama.chat.model=llama3.2
+
+# OpenAI Configuration (Commented out)
+# spring.ai.openai.api-key=${OPENAI_API_KEY}
+# spring.ai.openai.chat.model=gpt-4o
+
+# Gemini Configuration (Commented out)
+# spring.ai.vertex.ai.gemini.project-id=${GEMINI_PROJECT_ID}
+# spring.ai.vertex.ai.gemini.location=${GEMINI_LOCATION}
+# spring.ai.vertex.ai.gemini.chat.model=gemini-1.5-flash
 ```
 
 ## System message
