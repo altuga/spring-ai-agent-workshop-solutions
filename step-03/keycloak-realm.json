@@ -1,0 +1,42 @@
+{
+  "realm": "spring-ai",
+  "enabled": true,
+  "users": [
+    {
+      "username": "alice",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "alice"
+        }
+      ],
+      "realmRoles": [ "user" ]
+    },
+    {
+      "username": "bob",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "bob"
+        }
+      ],
+      "realmRoles": [ "admin" ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "backend-service",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "secret",
+      "redirectUris": [
+        "http://localhost:8080/*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    }
+  ]
+}
