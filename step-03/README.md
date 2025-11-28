@@ -5,8 +5,8 @@ We will leverage Spring Security with OIDC (OpenID Connect) to do that.
 
 If you want to learn more about Spring Security and OIDC, you can check the [official documentation](https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html).
 
-![token-flow](https://www.cncf.io/wp-content/uploads/2023/05/image-20.png)
-https://www.cncf.io/blog/2023/05/17/securing-cloud-native-microservices-with-role-based-access-control-using-keycloak/
+![OAuth 2.0 Login Flow](https://raw.githubusercontent.com/spring-projects/spring-security/main/docs/modules/ROOT/assets/images/servlet/oauth2/login/oauth2-login-flow.png)
+[A Quick Guide to OAuth2 With Spring Boot And Keycloak](https://www.baeldung.com/spring-boot-keycloak)
 
 ## Dependencies
 
