@@ -5,7 +5,21 @@ We will leverage Spring Security with OIDC (OpenID Connect) to do that.
 
 If you want to learn more about Spring Security and OIDC, you can check the [official documentation](https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html).
 
-![OAuth 2.0 Login Flow](https://raw.githubusercontent.com/spring-projects/spring-security/main/docs/modules/ROOT/assets/images/servlet/oauth2/login/oauth2-login-flow.png)
+```mermaid
+sequenceDiagram
+    participant User
+    participant Client as Spring Boot App
+    participant AuthServer as Keycloak (Auth Server)
+    
+    User->>Client: Access Protected Resource
+    Client->>User: Redirect to Login (Auth Server)
+    User->>AuthServer: Login with Credentials
+    AuthServer->>User: Redirect to Client with Code
+    User->>Client: Send Code
+    Client->>AuthServer: Exchange Code for Token
+    AuthServer->>Client: Return Access Token
+    Client->>User: Return Protected Resource
+```
 [A Quick Guide to OAuth2 With Spring Boot And Keycloak](https://www.baeldung.com/spring-boot-keycloak)
 
 ## Dependencies
