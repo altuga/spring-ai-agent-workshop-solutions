@@ -1,4 +1,4 @@
-package org.jugistanbul;
+package com.example.mcp.weather;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,14 +11,12 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/_static/**", "/webjars/**", "/favicon.ico", "/api/chat", "/chat-bot").permitAll()
-                .anyRequest().authenticated()
-            )
-            .oauth2Login(org.springframework.security.config.Customizer.withDefaults())
-            .csrf(csrf -> csrf.disable());
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().permitAll()
+            );
         return http.build();
     }
 }
