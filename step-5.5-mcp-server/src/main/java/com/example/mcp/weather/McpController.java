@@ -23,6 +23,12 @@ import java.util.concurrent.Executors;
 public class McpController {
 
     private static final Logger log = LoggerFactory.getLogger(McpController.class);
+    private static final String KEY_NAME = "name";
+    private static final String KEY_DESCRIPTION = "description";
+    private static final String KEY_INPUT_SCHEMA = "inputSchema";
+    private static final String KEY_TYPE = "type";
+    private static final String KEY_PROPERTIES = "properties";
+    private static final String KEY_REQUIRED = "required";
     private final WeatherMcpServer weatherMcpServer;
     private final ObjectMapper objectMapper;
     private final Map<String, ToolInfo> tools = new HashMap<>();
@@ -142,27 +148,35 @@ public class McpController {
             }
         }
         
-        method.setAccessible(true);
         return method.invoke(weatherMcpServer, args);
     }
 
     private Map<String, Object> toolSpecToMap(ToolSpecification spec) {
         Map<String, Object> toolMap = new LinkedHashMap<>();
-        toolMap.put("name", spec.name());
-        toolMap.put("description", spec.description() != null ? spec.description() : "");
+        toolMap.put(KEY_NAME, spec.name());
+        toolMap.put(KEY_DESCRIPTION, spec.description() != null ? spec.description() : "");
         
         Map<String, Object> inputSchema = new LinkedHashMap<>();
-        inputSchema.put("type", "object");
+        inputSchema.put(KEY_TYPE, "object");
         
-        // For simplicity, just create basic properties without accessing ToolParameter objects
+        // Create simple schemas for known tools
         Map<String, Object> properties = new LinkedHashMap<>();
-        properties.put("latitude", Map.of("type", "string", "description", "Latitude"));
-        properties.put("longitude", Map.of("type", "string", "description", "Longitude"));
+        if ("Current weather".equals(spec.name())) {
+            properties.put("latitude", Map.of(KEY_TYPE, "string", KEY_DESCRIPTION, "Latitude"));
+            properties.put("longitude", Map.of(KEY_TYPE, "string", KEY_DESCRIPTION, "Longitude"));
+            inputSchema.put(KEY_PROPERTIES, properties);
+            inputSchema.put(KEY_REQUIRED, List.of("latitude", "longitude"));
+        } else if ("Current weather by city".equals(spec.name())) {
+            properties.put("city", Map.of(KEY_TYPE, "string", KEY_DESCRIPTION, "City name (e.g., Istanbul, Berlin)"));
+            inputSchema.put(KEY_PROPERTIES, properties);
+            inputSchema.put(KEY_REQUIRED, List.of("city"));
+        } else {
+            // Fallback: no-arg schema
+            inputSchema.put(KEY_PROPERTIES, properties);
+            inputSchema.put(KEY_REQUIRED, List.of());
+        }
         
-        inputSchema.put("properties", properties);
-        inputSchema.put("required", List.of("latitude", "longitude"));
-        
-        toolMap.put("inputSchema", inputSchema);
+        toolMap.put(KEY_INPUT_SCHEMA, inputSchema);
         return toolMap;
     }
 
